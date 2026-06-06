@@ -112,16 +112,12 @@
         },
         "role": "viewer",
         "sections_permissions": {
-            "البرم": [],
-            "التفتيح": [],
             "الضواغط": [
                 "view",
                 "edit",
                 "add_event",
                 "manage_machines"
             ],
-            "الغزل": [],
-            "الكرد": [],
             "المحطات": [
                 "view",
                 "edit",
@@ -133,11 +129,7 @@
                 "edit",
                 "add_event",
                 "manage_machines"
-            ],
-            "تمشيط": [],
-            "سحب اول": [],
-            "سحب ثاني": [],
-            "ملفات": []
+            ]
         }
     },
     "مشرف_تحضيرات": {
@@ -145,7 +137,7 @@
         "permissions": {
             "all_sections": false
         },
-        "role": "viewer",
+        "role": "user",
         "sections_permissions": {
             "التفتيح": [
                 "view",
