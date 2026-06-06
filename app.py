@@ -271,11 +271,13 @@ def admin_users_management_tab():
     users = load_users_from_github()
     sections_list = get_all_sections_from_excel()
     
+    # ========== عرض المستخدمين الحاليين ==========
     st.subheader("📋 قائمة المستخدمين")
     for username, info in users.items():
         with st.expander(f"👤 {username} (الدور: {info.get('role', 'viewer')})"):
             col1, col2 = st.columns(2)
             with col1:
+                # تغيير كلمة المرور
                 new_password = st.text_input(f"كلمة المرور الجديدة لـ {username}", type="password", key=f"pass_{username}")
                 if new_password:
                     if st.button(f"تغيير كلمة المرور", key=f"change_pass_{username}"):
@@ -286,16 +288,12 @@ def admin_users_management_tab():
                         else:
                             st.error("فشل حفظ التغييرات")
             with col2:
+                # تغيير الدور (admin, editor, viewer)
                 current_role = info.get("role", "viewer")
                 role_options = ["admin", "editor", "viewer"]
                 if current_role not in role_options:
                     current_role = "viewer"
-                new_role = st.selectbox(
-                    f"الدور لـ {username}",
-                    role_options,
-                    index=role_options.index(current_role),
-                    key=f"role_{username}"
-                )
+                new_role = st.selectbox(f"الدور لـ {username}", role_options, index=role_options.index(current_role), key=f"role_{username}")
                 if new_role != info.get("role"):
                     users[username]["role"] = new_role
                     if save_users_to_github(users):
@@ -303,6 +301,7 @@ def admin_users_management_tab():
                         st.rerun()
             
             st.markdown("#### صلاحيات الأقسام")
+            # منح الوصول لجميع الأقسام
             all_sections_access = st.checkbox("منح الوصول إلى جميع الأقسام (بدون تفصيل)", value=info.get("permissions", {}).get("all_sections", False), key=f"all_sections_{username}")
             if all_sections_access:
                 users[username]["permissions"] = {"all_sections": True}
@@ -311,6 +310,7 @@ def admin_users_management_tab():
                 users[username]["permissions"] = {"all_sections": False}
                 if "sections_permissions" not in users[username]:
                     users[username]["sections_permissions"] = {}
+                # عرض الأقسام المتاحة
                 for section in sections_list:
                     current_perms = users[username]["sections_permissions"].get(section, [])
                     st.markdown(f"**{section}**")
@@ -331,6 +331,7 @@ def admin_users_management_tab():
                     if manage_machines_perm: new_perms.append("manage_machines")
                     users[username]["sections_permissions"][section] = new_perms
             
+            # زر حفظ الصلاحيات
             if st.button(f"💾 حفظ صلاحيات {username}", key=f"save_perms_{username}"):
                 if save_users_to_github(users):
                     st.success(f"تم حفظ صلاحيات {username}")
@@ -338,6 +339,7 @@ def admin_users_management_tab():
                 else:
                     st.error("فشل الحفظ")
             
+            # حذف المستخدم (ما عدا admin)
             if username != "admin":
                 if st.button(f"🗑️ حذف المستخدم {username}", key=f"delete_{username}"):
                     confirm = st.text_input(f"تأكيد حذف {username} - اكتب YES", key=f"confirm_{username}")
@@ -351,6 +353,7 @@ def admin_users_management_tab():
                     elif confirm:
                         st.warning("لم يتم التأكيد، اكتب YES")
     
+    # ========== إضافة مستخدم جديد ==========
     st.subheader("➕ إضافة مستخدم جديد")
     with st.form("add_user_form"):
         new_username = st.text_input("اسم المستخدم")
